@@ -1,0 +1,14 @@
+{
+  "name": "Iron Console — AI Workout Planner",
+  "short_name": "Iron Console",
+  "description": "A deterministic, AI-assisted hypertrophy planner that syncs across devices.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#15110E",
+  "theme_color": "#15110E",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

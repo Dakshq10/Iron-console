@@ -1,0 +1,325 @@
+/* ============================================================================
+   styles.css — "warm training console" design system.
+   Built for a sweaty phone glanced at between sets: big numerals, large tap
+   targets, and colour that means something — amber = effort / go heavier,
+   mint = done / hold / recovery, red = freeze / RPE10 / deload.
+   ========================================================================== */
+
+:root {
+  /* surfaces — warm dark, a palette not a single neon on black */
+  --bg:        #15110E;
+  --panel:     #1F1A16;
+  --panel-2:   #261F1A;
+  --hair:      #36302A;
+  --hair-soft: #2B251F;
+
+  /* ink */
+  --ink:       #F2EAE0;
+  --muted:     #A89C8E;
+  --faint:     #6F665B;
+
+  /* signals */
+  --amber:     #FF7A3D;   /* effort, increase, primary action */
+  --amber-ink: #1A0E06;
+  --mint:      #5BD6B0;   /* done, hold, recovery */
+  --mint-ink:  #06231B;
+  --red:       #E05656;   /* freeze, RPE10, deload */
+  --red-ink:   #2A0B0B;
+  --gold:      #E8B04B;   /* re-entry / caution accent */
+
+  --radius:    16px;
+  --radius-sm: 11px;
+  --tap:       48px;
+
+  --shadow:    0 10px 30px rgba(0,0,0,.45);
+  --display:   "Saira Condensed", "Arial Narrow", sans-serif;
+  --ui:        "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background:
+    radial-gradient(1200px 600px at 50% -10%, #221A14 0%, rgba(34,26,20,0) 60%),
+    var(--bg);
+  color: var(--ink);
+  font-family: var(--ui);
+  font-size: 16px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  min-height: 100vh;
+  overscroll-behavior-y: none;
+}
+button { font-family: inherit; cursor: pointer; }
+input, select { font-family: inherit; }
+
+/* ----------------------------------------------------------------- shell -- */
+.g-app { max-width: 560px; margin: 0 auto; padding: 0 16px 120px; }
+
+.g-topbar {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; padding: 16px 4px 12px;
+  background: linear-gradient(180deg, var(--bg) 70%, rgba(21,17,14,0));
+}
+.g-brand { display: flex; align-items: center; gap: 10px; }
+.g-brand .mark { width: 30px; height: 30px; display: block; }
+.g-brand h1 {
+  font-family: var(--display); font-weight: 600;
+  font-size: 22px; letter-spacing: .03em; text-transform: uppercase;
+  margin: 0; line-height: 1;
+}
+.g-syncpill {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted); border: 1px solid var(--hair);
+  padding: 6px 10px; border-radius: 999px; background: var(--panel);
+}
+.g-syncpill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--faint); }
+.g-syncpill.cloud .dot { background: var(--mint); box-shadow: 0 0 8px var(--mint); }
+.g-syncpill.local .dot { background: var(--gold); }
+.g-syncpill.err   .dot { background: var(--red); }
+
+/* date header */
+.g-dayhead { padding: 6px 4px 14px; }
+.g-dayhead .eyebrow {
+  font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted);
+}
+.g-dayhead .title {
+  font-family: var(--display); font-weight: 600; letter-spacing: .02em;
+  font-size: clamp(30px, 8vw, 40px); line-height: 1.02; margin: 2px 0 0;
+}
+.g-dayhead .sub { color: var(--muted); font-size: 14px; margin-top: 4px; }
+
+/* ----------------------------------------------------------------- banners */
+.g-banner {
+  display: flex; gap: 10px; align-items: flex-start;
+  border-radius: var(--radius-sm); padding: 11px 13px; margin: 8px 0;
+  font-size: 13.5px; line-height: 1.35;
+  border: 1px solid var(--hair); background: var(--panel);
+}
+.g-banner .ic { flex: 0 0 auto; margin-top: 1px; }
+.g-banner.warn { border-color: color-mix(in srgb, var(--gold) 45%, var(--hair)); background: color-mix(in srgb, var(--gold) 9%, var(--panel)); }
+.g-banner.bad  { border-color: color-mix(in srgb, var(--red) 50%, var(--hair));  background: color-mix(in srgb, var(--red) 10%, var(--panel)); }
+.g-banner.good { border-color: color-mix(in srgb, var(--mint) 45%, var(--hair)); background: color-mix(in srgb, var(--mint) 9%, var(--panel)); }
+.g-banner.ai   { border-color: color-mix(in srgb, var(--amber) 45%, var(--hair)); background: color-mix(in srgb, var(--amber) 8%, var(--panel)); }
+
+/* --------------------------------------------------- the weight readout card */
+.g-card {
+  position: relative; background: var(--panel);
+  border: 1px solid var(--hair); border-radius: var(--radius);
+  padding: 16px 16px 14px; margin: 12px 0;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.g-card .accent { position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--amber); }
+.g-card[data-flag="reentry"] .accent,
+.g-card[data-flag="cap_hold"] .accent { background: var(--gold); }
+.g-card[data-flag="freeze"] .accent,
+.g-card[data-flag="forced_deload"] .accent,
+.g-card[data-flag="deload"] .accent { background: var(--red); }
+.g-card[data-flag="needs_input"] .accent,
+.g-card[data-flag="estimated"] .accent { background: var(--mint); }
+
+.g-card .slotrow { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.g-card .slotlabel {
+  font-size: 11.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted);
+}
+.g-tag {
+  font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; font-weight: 600;
+  padding: 4px 8px; border-radius: 999px; white-space: nowrap;
+}
+.g-tag.work     { color: var(--amber); border: 1px solid color-mix(in srgb, var(--amber) 50%, transparent); }
+.g-tag.increase { color: var(--amber-ink); background: var(--amber); }
+.g-tag.reps_bump{ color: var(--amber-ink); background: var(--amber); }
+.g-tag.hold, .g-tag.cap_hold, .g-tag.reentry { color: var(--gold); border: 1px solid color-mix(in srgb, var(--gold) 50%, transparent); }
+.g-tag.freeze, .g-tag.deload, .g-tag.forced_deload { color: var(--red-ink); background: var(--red); }
+.g-tag.estimated, .g-tag.needs_input { color: var(--mint-ink); background: var(--mint); }
+
+.g-card .exname {
+  font-family: var(--ui); font-weight: 600; font-size: 18px; letter-spacing: -.01em;
+  margin: 8px 0 2px;
+}
+
+/* the instrument readout */
+.g-readout { display: flex; align-items: flex-end; gap: 16px; margin-top: 8px; flex-wrap: wrap; }
+.g-weight { display: flex; align-items: baseline; gap: 6px; }
+.g-weight .num {
+  font-family: var(--display); font-weight: 700; letter-spacing: .005em;
+  font-size: clamp(52px, 16vw, 76px); line-height: .82; color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.g-weight .unit { font-family: var(--display); font-size: 22px; color: var(--muted); letter-spacing: .04em; }
+.g-weight.bw .num { font-size: clamp(34px, 10vw, 46px); }
+
+.g-subreadouts { display: flex; gap: 14px; padding-bottom: 6px; }
+.g-metric { display: flex; flex-direction: column; }
+.g-metric .v {
+  font-family: var(--display); font-weight: 600; font-size: 26px; line-height: 1;
+  font-variant-numeric: tabular-nums; color: var(--ink);
+}
+.g-metric .k { font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-top: 3px; }
+
+.g-note {
+  margin-top: 12px; padding-top: 11px; border-top: 1px solid var(--hair-soft);
+  font-size: 13.5px; color: var(--ink); display: flex; gap: 8px; align-items: flex-start;
+}
+.g-note .ic { color: var(--amber); flex: 0 0 auto; margin-top: 1px; }
+.g-note.ai .ic { color: var(--amber); }
+.g-lasttime { margin-top: 8px; font-size: 12px; color: var(--faint); font-variant-numeric: tabular-nums; }
+
+/* card footer actions (pre-session) */
+.g-card .cardactions { margin-top: 12px; display: flex; gap: 8px; }
+
+/* -------------------------------------------------------- live logging rows */
+.g-log-ex { margin: 14px 0; }
+.g-log-ex .head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+.g-log-ex .head .name { font-weight: 600; font-size: 16.5px; }
+.g-log-ex .head .target { font-family: var(--display); font-size: 18px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.g-set {
+  display: grid; grid-template-columns: 30px 1fr 1fr 1fr 46px; gap: 8px; align-items: center;
+  padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--hair-soft);
+  background: var(--panel); margin-bottom: 8px;
+}
+.g-set.done { border-color: color-mix(in srgb, var(--mint) 40%, var(--hair)); background: color-mix(in srgb, var(--mint) 7%, var(--panel)); }
+.g-set .ix { text-align: center; color: var(--faint); font-family: var(--display); font-size: 20px; }
+.g-field { display: flex; flex-direction: column; gap: 2px; }
+.g-field label { font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.g-num {
+  width: 100%; background: var(--bg); border: 1px solid var(--hair); color: var(--ink);
+  border-radius: 9px; padding: 9px 8px; font-size: 18px; text-align: center;
+  font-family: var(--display); font-variant-numeric: tabular-nums; letter-spacing: .02em;
+  min-height: var(--tap);
+}
+.g-num:focus { outline: none; border-color: var(--amber); box-shadow: 0 0 0 3px color-mix(in srgb, var(--amber) 25%, transparent); }
+.g-check {
+  width: 44px; height: 44px; border-radius: 11px; border: 1px solid var(--hair);
+  background: var(--panel-2); color: var(--muted); display: grid; place-items: center;
+  font-size: 20px; transition: transform .08s ease;
+}
+.g-check:active { transform: scale(.92); }
+.g-check.on { background: var(--mint); color: var(--mint-ink); border-color: var(--mint); }
+
+/* rest timer pin-bar */
+.g-rest {
+  position: sticky; bottom: 86px; z-index: 15; margin: 10px 0 0;
+  border: 1px solid color-mix(in srgb, var(--amber) 40%, var(--hair));
+  background: color-mix(in srgb, var(--amber) 10%, var(--panel));
+  border-radius: var(--radius-sm); padding: 10px 12px; overflow: hidden;
+}
+.g-rest .row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.g-rest .t { font-family: var(--display); font-size: 30px; font-variant-numeric: tabular-nums; color: var(--ink); line-height: 1; }
+.g-rest .lbl { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.g-rest .bar { position: absolute; left: 0; bottom: 0; height: 3px; background: var(--amber); transition: width 1s linear; }
+.g-rest .skip { background: transparent; border: 1px solid var(--hair); color: var(--muted); border-radius: 9px; padding: 7px 12px; font-size: 12px; }
+
+/* ------------------------------------------------------------------ buttons */
+.g-btn {
+  -webkit-appearance: none; appearance: none; border: 1px solid var(--hair);
+  background: var(--panel-2); color: var(--ink); border-radius: 12px;
+  padding: 0 16px; min-height: var(--tap); font-size: 15px; font-weight: 600;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  letter-spacing: .01em;
+}
+.g-btn:active { transform: translateY(1px); }
+.g-btn.block { width: 100%; }
+.g-btn.primary { background: var(--amber); color: var(--amber-ink); border-color: var(--amber); }
+.g-btn.go {
+  background: var(--amber); color: var(--amber-ink); border-color: var(--amber);
+  font-family: var(--display); font-size: 22px; letter-spacing: .06em; text-transform: uppercase;
+  min-height: 60px;
+}
+.g-btn.mint { background: var(--mint); color: var(--mint-ink); border-color: var(--mint); }
+.g-btn.ghost { background: transparent; }
+.g-btn.sm { min-height: 40px; font-size: 13px; padding: 0 12px; }
+.g-btn.danger { color: var(--red); border-color: color-mix(in srgb, var(--red) 45%, var(--hair)); background: transparent; }
+.g-btn:disabled { opacity: .5; }
+
+.g-sticky-cta {
+  position: sticky; bottom: 84px; z-index: 12; padding-top: 8px;
+  background: linear-gradient(0deg, var(--bg) 60%, rgba(21,17,14,0));
+}
+
+/* -------------------------------------------------------------- bottom nav */
+.g-nav {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+  display: flex; justify-content: center; gap: 4px;
+  padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--panel) 92%, transparent);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--hair);
+}
+.g-nav .item {
+  flex: 1 1 0; max-width: 96px; background: transparent; border: 0; color: var(--faint);
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 6px 4px; border-radius: 12px; font-size: 10.5px; letter-spacing: .04em;
+}
+.g-nav .item.active { color: var(--amber); }
+.g-nav .item svg { width: 22px; height: 22px; }
+
+/* ----------------------------------------------------------------- generic */
+.g-section-title {
+  font-family: var(--display); font-size: 15px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--muted); margin: 22px 4px 8px;
+}
+.g-panel { background: var(--panel); border: 1px solid var(--hair); border-radius: var(--radius); padding: 16px; margin: 10px 0; }
+.g-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--hair-soft); }
+.g-row:last-child { border-bottom: 0; }
+.g-row .k { color: var(--muted); font-size: 13px; }
+.g-row .v { font-variant-numeric: tabular-nums; }
+
+.g-input {
+  width: 100%; background: var(--bg); border: 1px solid var(--hair); color: var(--ink);
+  border-radius: 11px; padding: 12px 13px; font-size: 15px; min-height: var(--tap);
+}
+.g-input:focus { outline: none; border-color: var(--amber); box-shadow: 0 0 0 3px color-mix(in srgb, var(--amber) 22%, transparent); }
+.g-label { display: block; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 12px 0 6px; }
+.g-help { font-size: 12.5px; color: var(--faint); margin-top: 6px; line-height: 1.4; }
+.g-fieldset { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+/* progress trend */
+.g-trend { width: 100%; height: 150px; display: block; }
+.g-trend .grid { stroke: var(--hair-soft); stroke-width: 1; }
+.g-trend .waist { stroke: var(--amber); fill: none; stroke-width: 2.5; }
+.g-trend .shoulder { stroke: var(--mint); fill: none; stroke-width: 2.5; }
+.g-trend .dot-w { fill: var(--amber); }
+.g-trend .dot-s { fill: var(--mint); }
+.g-legend { display: flex; gap: 16px; margin: 8px 2px 0; font-size: 12px; color: var(--muted); }
+.g-legend .sw { display: inline-block; width: 12px; height: 3px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
+
+.g-history-day { border-left: 2px solid var(--hair); padding-left: 14px; margin: 4px 0 16px; }
+.g-history-day .d { font-family: var(--display); font-size: 19px; letter-spacing: .03em; }
+.g-history-day .meta { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
+.g-history-day .ln { font-size: 13px; padding: 3px 0; color: var(--ink); font-variant-numeric: tabular-nums; }
+.g-history-day .ln .ex { color: var(--muted); }
+
+.g-empty { text-align: center; color: var(--faint); padding: 40px 20px; }
+.g-empty .big { font-family: var(--display); font-size: 22px; color: var(--muted); letter-spacing: .04em; }
+
+.g-toast {
+  position: fixed; left: 50%; bottom: 96px; transform: translateX(-50%);
+  background: var(--panel-2); border: 1px solid var(--hair); color: var(--ink);
+  padding: 11px 16px; border-radius: 12px; font-size: 14px; z-index: 50; box-shadow: var(--shadow);
+  max-width: 92vw;
+}
+.g-toast.bad { border-color: var(--red); }
+.g-toast.good { border-color: var(--mint); }
+
+.g-spinner { width: 18px; height: 18px; border: 2px solid var(--hair); border-top-color: var(--amber); border-radius: 50%; animation: spin .7s linear infinite; display: inline-block; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.g-overlay {
+  position: fixed; inset: 0; z-index: 60; background: color-mix(in srgb, var(--bg) 70%, transparent);
+  display: grid; place-items: center; padding: 20px; backdrop-filter: blur(3px);
+}
+.g-modal { width: 100%; max-width: 420px; background: var(--panel); border: 1px solid var(--hair); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); }
+.g-modal h3 { margin: 0 0 6px; font-family: var(--display); letter-spacing: .03em; font-size: 22px; }
+.g-chiprow { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.g-chip { border: 1px solid var(--hair); background: var(--panel-2); color: var(--ink); border-radius: 999px; padding: 9px 13px; font-size: 13px; }
+.g-chip.sel { border-color: var(--amber); color: var(--amber); }
+
+@media (max-width: 360px) {
+  .g-set { grid-template-columns: 24px 1fr 1fr 1fr 44px; gap: 6px; }
+}
